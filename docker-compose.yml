@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+    qme-wp-myslq:
+        image: mysql:8.0
+        container_name: qme-wp-myslq
+        restart: unless-stopped
+        env_file: .env
+        volumes:
+            - qme-wp-mysql-vol:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        command: '--default-authentication-plugin=mysql_native_password'
+        networks:
+            - qualifiqueme.bridge
+
+    qme-wp:
+        depends_on:
+            - qme-wp-myslq
+        image: wordpress:5.7.2-fpm-alpine
+        container_name: qme-wp
+        restart: unless-stopped
+        env_file: .env
+        volumes:
+            - qme-wp-vol:/var/www/html
+        ports:
+            - "9000:9000"
+        networks:
+            - qualifiqueme.bridge
+
+volumes:
+    qme-wp-vol:
+        external: true
+    qme-wp-mysql-vol:
+        external: true
+
+networks:
+    qualifiqueme.bridge:
+        external: true
